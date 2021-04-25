@@ -27,6 +27,18 @@ const NormalLoginForm = () => {
                         required: true,
                         message: 'Please input your Username!',
                     },
+                    {
+                        min: 4,
+                        message: 'the min value is 4'
+                    },
+                    {
+                        max: 12,
+                        message: 'the max value is 12'
+                    },
+                    {
+                        pattern: /^[a-zA-Z0-9_]+$/,
+                        message: 'the username is made of a-z A-Z or _'
+                    }
                 ]}
             >
                 <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="Username" />
@@ -34,9 +46,26 @@ const NormalLoginForm = () => {
             <Form.Item
                 name="password"
                 rules={[
+                    // {
+                    //     required: true,
+                    //     message: 'Please input your Password!',
+                    // }
                     {
-                        required: true,
-                        message: 'Please input your Password!',
+                        validator: (_, value) => {
+                            // value ? Promise.resolve() : Promise.reject(new Error('Should accept agreement')),
+                            if (!value) {
+                                return Promise.reject(new Error('Password cannot be empty'));
+                            } else if (value.length < 4) {
+                                return Promise.reject(new Error('Password min value is 4'));
+                            } else if (value.length > 12) {
+                                return Promise.reject(new Error('Password min value is 12'));
+                            } else if (!/^[a-zA-Z_]+$.test(value)/) {
+                                return Promise.reject(new Error('the password is made of a-z A-Z or _'));
+                            } else {
+                                return Promise.resolve();
+                            }
+
+                        }
                     },
                 ]}
             >
