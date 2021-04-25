@@ -6,9 +6,17 @@ import logo from './images/logo.png'
 import { Form, Input, Button } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
+import { reqLogin } from '../../api'
+
 const NormalLoginForm = () => {
     const onFinish = (values) => {
-        console.log('Received values of form: ', values);
+        // console.log('Received values of form: ', values);
+        const { username, password } = values;
+        reqLogin(username, password).then((response) => {
+            console.log(response.data)
+        }).catch((error) => {
+            console.log(error)
+        })
     };
 
     return (
