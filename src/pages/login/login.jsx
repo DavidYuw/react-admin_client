@@ -1,22 +1,44 @@
 import React, { Component } from 'react'
+import { Redirect } from 'react-router-dom'
 
 import './login.less'
 import logo from './images/logo.png'
 
-import { Form, Input, Button } from 'antd';
+import { Form, Input, Button, message } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
 
 import { reqLogin } from '../../api'
+import memoryUtils from '../../utils/memoryUtils'
+import storeUtils from '../../utils/storeUtils'
 
-const NormalLoginForm = () => {
-    const onFinish = (values) => {
-        // console.log('Received values of form: ', values);
+const NormalLoginForm = (props) => {
+
+    const { history } = props;
+
+    const onFinish = async (values) => {
+        // console.log('Received values of form: ', values);        
         const { username, password } = values;
-        reqLogin(username, password).then((response) => {
-            console.log(response.data)
-        }).catch((error) => {
-            console.log(error)
-        })
+
+        // reqLogin(username, password).then((response) => {
+        //     console.log(response.data)
+        // }).catch((error) => {
+        //     console.log(error)
+        // })
+
+        const result = await reqLogin(username, password)
+
+        if (result.status === 0) {
+            memoryUtils.user = result.data 
+            storeUtils.saveUser(result.data)
+
+            message.success("login success")
+            // console.log(history)
+            history.replace("/")
+        } else {
+            message.error("login fail:" + result.message);
+
+        }
+
     };
 
     return (
@@ -99,6 +121,12 @@ export default class Login extends Component {
 
     render() {
 
+        const user = memoryUtils.user;
+
+        if (user._id) {
+            return <Redirect to='/' />
+        }
+
         return (
             <div className='login'>
                 <header className='login-header'>
@@ -108,7 +136,7 @@ export default class Login extends Component {
                 <section className='login-content'>
                     <h2>User Login</h2>
 
-                    <NormalLoginForm />
+                    <NormalLoginForm history={this.props.history} />
                 </section>
             </div>
         )

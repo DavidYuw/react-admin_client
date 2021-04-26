@@ -1,7 +1,12 @@
 
 import ajax from './ajax'
 
-const BASE = 'http://localhost:5000'
+//development config 
+const BASE = 'http://localhost:3000'
+
+
+//production config 
+// const BASE = 'http://localhost:5000'
 
 //Login request
 export const reqLogin = (username, password) => ajax(BASE + '/login', { username, password }, "POST")
