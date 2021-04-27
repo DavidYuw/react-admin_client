@@ -4,18 +4,20 @@ import './index.less'
 
 import { Menu } from 'antd';
 import {
-    AppstoreOutlined,
-    MenuUnfoldOutlined,
-    MenuFoldOutlined,
-    PieChartOutlined,
-    DesktopOutlined,
-    ContainerOutlined,
-    MailOutlined,
+    // AppstoreOutlined,
+    // MenuUnfoldOutlined,
+    // MenuFoldOutlined,
+    // PieChartOutlined,
+    // DesktopOutlined,
+    // ContainerOutlined,
+    // MailOutlined,
 } from '@ant-design/icons';
+
+import * as Icon from '@ant-design/icons';
+
 
 
 import logo from "../../assets/images/logo.png"
-import meneList from "../../config/menuConfig"
 import menuList from '../../config/menuConfig';
 
 
@@ -25,15 +27,22 @@ export default class LeftNav extends Component {
 
     getMenuNodes = (menuList) => {
         return menuList.map((item) => {
+
+            console.log(item.icon)
+
+            console.log(Icon[item.icon])
+
+            const icon = React.createElement(Icon[item.icon])
+
             if (!item.children) {
                 return (
-                    <Menu.Item key={item.key} icon={<MailOutlined  />}>
+                    <Menu.Item key={item.key} icon={icon}>
                         <Link to={item.key}>{item.title}</Link>
                     </Menu.Item>
                 )
             } else {
                 return (
-                    <SubMenu key={item.key} icon={<MailOutlined  />} title={item.title}>
+                    <SubMenu key={item.key} icon={icon} title={item.title}>
                         {this.getMenuNodes(item.children)}
                     </SubMenu>
                 )
@@ -43,17 +52,17 @@ export default class LeftNav extends Component {
 
     render() {
         return (
-            <div to="/" className="left-nav">
-                <Link className="left-nav-header">
+            <div className="left-nav">
+                <Link to="/" className="left-nav-header">
                     <img src={logo} alt="" />
                     <h1>硅谷后台</h1>
                 </Link>
-               
+
                 <Menu
                     mode="inline"
                     theme="dark"
                 >
-                    {this.getMenuNodes(meneList)}
+                    {this.getMenuNodes(menuList)}
 
                 </Menu>
             </div>
