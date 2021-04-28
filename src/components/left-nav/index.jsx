@@ -1,36 +1,23 @@
 import React, { Component } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, withRouter } from 'react-router-dom'
 import './index.less'
 
-import { Menu } from 'antd';
-import {
-    // AppstoreOutlined,
-    // MenuUnfoldOutlined,
-    // MenuFoldOutlined,
-    // PieChartOutlined,
-    // DesktopOutlined,
-    // ContainerOutlined,
-    // MailOutlined,
-} from '@ant-design/icons';
+import { Menu } from 'antd'
 
-import * as Icon from '@ant-design/icons';
-
-
+import * as Icon from '@ant-design/icons'
 
 import logo from "../../assets/images/logo.png"
-import menuList from '../../config/menuConfig';
+import menuList from '../../config/menuConfig'
 
 
 const { SubMenu } = Menu;
 
-export default class LeftNav extends Component {
+class LeftNav extends Component {
 
     getMenuNodes = (menuList) => {
+        const pathname = this.props.location.pathname;
+
         return menuList.map((item) => {
-
-            console.log(item.icon)
-
-            console.log(Icon[item.icon])
 
             const icon = React.createElement(Icon[item.icon])
 
@@ -41,6 +28,13 @@ export default class LeftNav extends Component {
                     </Menu.Item>
                 )
             } else {
+
+                const cItem = item.children.find(cItem => cItem.key === pathname)
+
+                if (cItem) {
+                    this.openKey = item.key
+                }
+
                 return (
                     <SubMenu key={item.key} icon={icon} title={item.title}>
                         {this.getMenuNodes(item.children)}
@@ -50,7 +44,15 @@ export default class LeftNav extends Component {
         })
     }
 
+    UNSAFE_componentWillMount() {
+        this.menuNodes = this.getMenuNodes(menuList);
+    }
+
     render() {
+
+        const pathname = this.props.location.pathname;
+        // console.log(pathname);
+
         return (
             <div className="left-nav">
                 <Link to="/" className="left-nav-header">
@@ -59,13 +61,17 @@ export default class LeftNav extends Component {
                 </Link>
 
                 <Menu
+                    selectedKeys={[pathname]}
+                    defaultOpenKeys={[this.openKey]}
                     mode="inline"
                     theme="dark"
                 >
-                    {this.getMenuNodes(menuList)}
+                    {this.menuNodes}
 
                 </Menu>
             </div>
         )
     }
 }
+
+export default withRouter(LeftNav)
