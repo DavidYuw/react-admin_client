@@ -19,6 +19,7 @@ import Pie from '../charts/pie'
 import Order from '../order/order'
 
 
+
 const { Footer, Sider, Content } = Layout;
 
 export default class Admin extends Component {
@@ -37,7 +38,7 @@ export default class Admin extends Component {
                 <Sider><LeftNav /></Sider>
                 <Layout>
                     <RightHeader />
-                    <Content>
+                    <Content style={{ margin: 20, backgroundColor: "#fff" }}>
                         <Switch>
                             <Route path='/home' component={Home} />
                             <Route path='/category' component={Category} />

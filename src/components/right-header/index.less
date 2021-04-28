@@ -1,4 +1,54 @@
 .right-header{
-    background-color:pink;
+    background-color:white;
     height: 80px;
+
+    .right-header-top{
+        height: 40px;
+        line-height: 40px;
+        text-align: right;
+        padding-right: 30px;
+        border-bottom: 1px solid #1da57a;
+        
+        span{
+            margin-right: 10px;
+        }
+    }
+
+    .right-header-bottom{
+        height: 40px;
+        display: flex;
+        align-items: center;
+
+        .right-header-bottom-left{
+            width: 25%;
+            text-align: center;
+            font-size: 20px;
+            position: relative;
+
+            &::after{
+                content: "";
+                position: absolute;
+                top: 100%;
+                right: 50%;
+                transform: translateX(50%);
+                border-top: 20px solid white;
+                border-right: 20px solid transparent;
+                border-bottom: 20px solid transparent;
+                border-left: 20px solid transparent;
+            }
+        }
+
+        .right-header-bottom-right{
+            width: 75%;
+            text-align: right;
+            margin-right: 30px;
+
+            img{
+                margin: 0 15px;
+                width: 30px;
+                height: 20px;
+            }
+        }
+
+    }
 }
