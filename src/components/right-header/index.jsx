@@ -2,6 +2,8 @@ import React, { Component } from 'react'
 import { withRouter } from 'react-router-dom'
 import { Modal } from 'antd';
 import './index.less'
+
+import LinkButton from '../link-button'
 import { formateDate } from '../../utils/dateUtils'
 import memoryUtils from '../../utils/memoryUtils'
 import storeUtils from '../../utils/storeUtils'
@@ -77,7 +79,7 @@ class RightHeader extends Component {
             <div className="right-header">
                 <div className="right-header-top">
                     <span> 欢迎， {username}</span>
-                    <a href="#!" onClick={this.logout}>退出</a>
+                    <LinkButton onClick={this.logout}>退出</LinkButton>
                 </div>
                 <div className="right-header-bottom">
                     <div className="right-header-bottom-left">{title}</div>
