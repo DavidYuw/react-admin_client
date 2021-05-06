@@ -7,7 +7,7 @@ import {
 } from '@ant-design/icons';
 
 import LinkButton from '../../components/link-button'
-import { reqCategory, reqUpdateCategory } from '../../api/index'
+import { reqCategory, reqUpdateCategory, reqAddCategory } from '../../api/index'
 import AddForm from './add-form'
 import UpdateForm from './update-form'
 
@@ -20,21 +20,26 @@ export default class Category extends Component {
         parentId: '0',
         parentName: '',
         showState: 0, //0 both hide ,1 add modal show, 2 modify modal show
+        curPage: 1
     }
 
     showCategory = () => {
+        console.log("&&&&&&&-------")
         this.setState({
             parentId: '0',
             parentName: '',
-            subCategory: []
+            subCategory: [],
+            curPage: 1
         })
     }
 
     showSubCategory = (rowItem) => {
+        console.log("#######-------")
         // console.log(rowItem)
         this.setState({
             parentId: rowItem._id,
-            parentName: rowItem.name
+            parentName: rowItem.name,
+            curPage: 1
         }, () => {
             this.getCategory()
         })
@@ -63,10 +68,10 @@ export default class Category extends Component {
         this.initColumList()
     }
 
-    getCategory = async () => {
+    getCategory = async (parentId) => {
         this.setState({ loading: true })
 
-        const { parentId } = this.state
+        parentId = parentId || this.state.parentId
         const result = await reqCategory(parentId)
 
         this.setState({ loading: false })
@@ -96,7 +101,30 @@ export default class Category extends Component {
 
     }
 
-    addCategory = () => {
+    addCategory = async () => {
+
+        console.log("addcatefory()")
+
+        this.setState({
+            showState: 0
+        })
+
+        const { parentId, categoryName } = this.form.current.getFieldsValue()
+
+        this.form.current.resetFields()
+
+        console.log(parentId, categoryName)
+
+        const result = await reqAddCategory(categoryName, parentId)
+
+        if (result.status === 0) {
+            if (parentId === this.state.parentId) {
+                this.getCategory()
+            } else if (parentId === '0') {
+                this.getCategory('0')
+            }
+
+        }
 
     }
 
@@ -116,13 +144,9 @@ export default class Category extends Component {
         })
 
         const categoryId = this.rowItem._id
-
-        console.log(this.rowItem)
         const categoryName = this.form.current.getFieldValue("categoryName")
 
-        const result = await reqUpdateCategory( categoryId, categoryName )
-
-        console.log(result)
+        const result = await reqUpdateCategory(categoryId, categoryName)
 
         if (result.status === 0) {
             this.getCategory()
@@ -134,7 +158,15 @@ export default class Category extends Component {
     }
 
 
+    onChange = page => {
+        this.setState({
+            curPage: page,
+        });
+    };
+
     render() {
+
+        console.log("@-- render()")
 
         const { category, subCategory, parentId, parentName, loading, showState } = this.state
 
@@ -156,7 +188,6 @@ export default class Category extends Component {
             </Button>
         )
 
-
         return (
             <Card title={title} extra={extra}>
                 <Table
@@ -165,11 +196,11 @@ export default class Category extends Component {
                     loading={loading}
                     dataSource={parentId === '0' ? category : subCategory}
                     columns={this.columns}
-                    pagination={{ defaultPageSize: 2, showQuickJumper: true }}
+                    pagination={{ defaultPageSize: 2, showQuickJumper: true, current: this.state.curPage, onChange: this.onChange }}
                 />
 
                 <Modal title="添加分类" visible={showState === 1} onOk={this.addCategory} onCancel={this.handleCancel}>
-                    <AddForm></AddForm>
+                    <AddForm category={category} parentId={parentId} setForm={(form) => { this.form = form }}></AddForm>
                 </Modal>
 
                 <Modal title="修改分类" visible={showState === 2} onOk={this.updateCategory} onCancel={this.handleCancel}>
