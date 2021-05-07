@@ -24,7 +24,6 @@ export default class Category extends Component {
     }
 
     showCategory = () => {
-        console.log("&&&&&&&-------")
         this.setState({
             parentId: '0',
             parentName: '',
@@ -34,8 +33,6 @@ export default class Category extends Component {
     }
 
     showSubCategory = (rowItem) => {
-        console.log("#######-------")
-        // console.log(rowItem)
         this.setState({
             parentId: rowItem._id,
             parentName: rowItem.name,
@@ -91,41 +88,45 @@ export default class Category extends Component {
         this.setState({
             showState: 0
         })
+        this.form.current.resetFields()
+
     }
 
     showAddCategory = () => {
+        
         this.setState({
             showState: 1
         })
-
-
     }
 
-    addCategory = async () => {
+    addCategory = () => {
 
         console.log("addcatefory()")
 
-        this.setState({
-            showState: 0
-        })
+        this.form.current.validateFields()
+            .then(async values => {
+                this.setState({
+                    showState: 0
+                })
 
-        const { parentId, categoryName } = this.form.current.getFieldsValue()
+                const { parentId, categoryName } = values
 
-        this.form.current.resetFields()
+                this.form.current.resetFields()
 
-        console.log(parentId, categoryName)
+                console.log(parentId, categoryName)
 
-        const result = await reqAddCategory(categoryName, parentId)
+                const result = await reqAddCategory(categoryName, parentId)
 
-        if (result.status === 0) {
-            if (parentId === this.state.parentId) {
-                this.getCategory()
-            } else if (parentId === '0') {
-                this.getCategory('0')
-            }
-
-        }
-
+                if (result.status === 0) {
+                    if (parentId === this.state.parentId) {
+                        this.getCategory()
+                    } else if (parentId === '0') {
+                        this.getCategory('0')
+                    }
+                }
+            }).catch(errinfo => {
+                console.log(errinfo)
+            })
     }
 
     showUpdateCategory = (rowItem) => {
@@ -136,21 +137,28 @@ export default class Category extends Component {
         })
     }
 
-    updateCategory = async () => {
-        console.log('@ updateCategory')
+    updateCategory = () => {
 
-        this.setState({
-            showState: 0
-        })
+        // console.log('@ updateCategory')
 
-        const categoryId = this.rowItem._id
-        const categoryName = this.form.current.getFieldValue("categoryName")
+        this.form.current.validateFields()
+            .then(async values => {
+                this.setState({
+                    showState: 0
+                })
 
-        const result = await reqUpdateCategory(categoryId, categoryName)
+                const categoryId = this.rowItem._id
+                const { categoryName } = values
 
-        if (result.status === 0) {
-            this.getCategory()
-        }
+                const result = await reqUpdateCategory(categoryId, categoryName)
+
+                if (result.status === 0) {
+                    this.getCategory()
+                }
+
+            }).catch(errinfo => {
+                console.log(errinfo)
+            }).finally()
     }
 
     componentDidMount() {
@@ -165,8 +173,6 @@ export default class Category extends Component {
     };
 
     render() {
-
-        console.log("@-- render()")
 
         const { category, subCategory, parentId, parentName, loading, showState } = this.state
 
@@ -199,11 +205,11 @@ export default class Category extends Component {
                     pagination={{ defaultPageSize: 2, showQuickJumper: true, current: this.state.curPage, onChange: this.onChange }}
                 />
 
-                <Modal title="添加分类" visible={showState === 1} onOk={this.addCategory} onCancel={this.handleCancel}>
+                <Modal title="添加分类" visible={showState === 1} onOk={this.addCategory} onCancel={this.handleCancel}  >
                     <AddForm category={category} parentId={parentId} setForm={(form) => { this.form = form }}></AddForm>
                 </Modal>
 
-                <Modal title="修改分类" visible={showState === 2} onOk={this.updateCategory} onCancel={this.handleCancel}>
+                <Modal title="修改分类" visible={showState === 2} onOk={this.updateCategory} onCancel={this.handleCancel} >
                     <UpdateForm categoryName={rowItem.name} setForm={(form) => { this.form = form }}></UpdateForm>
                 </Modal>
             </Card>

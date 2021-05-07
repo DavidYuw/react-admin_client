@@ -36,7 +36,7 @@ class UpdateForm extends Component {
                     rules={[
                         {
                             required: true,
-                            message: 'Please input category!',
+                            message: 'new category name must be inputed!',
                         },
                     ]}
                     initialValue={this.props.categoryName}

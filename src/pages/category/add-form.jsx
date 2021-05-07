@@ -44,6 +44,12 @@ export default class AddForm extends Component {
                 </Item>
                 <Item
                     name="categoryName"
+                    rules={[
+                        {
+                            required: true,
+                            message: 'new category name must be inputed!',
+                        },
+                    ]}
                     initialValue=''
                 >
                     <Input placeholder="please input category name"></Input>
