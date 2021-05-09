@@ -6,38 +6,20 @@ import {
 } from '@ant-design/icons'
 
 import LinkButton from '../../components/link-button'
+import { reqProducts, reqSearchProducts } from '../../api/index'
+import { PAGE_SIZE } from '../../utils/constants'
 
 const Option = Select.Option
 
 export default class ProductHome extends Component {
 
     state = {
-        products: [
-            {
-                "status": 1,
-                "imgs": [],
-                "_id": "6095447f28fc842b56abf6b6",
-                "name": "联想ThinkPad X1",
-                "desc": "联想超级笔记本",
-                "price": 6000,
-                "detail": "<p>联想超级笔记本</p>\n",
-                "pCategoryId": "0",
-                "categoryId": "608d3e3eebe5b998882ce135",
-                "__v": 0
-            },
-            {
-                "status": 1,
-                "imgs": [],
-                "_id": "609544e128fc842b56abf6b7",
-                "name": "Apple MacBook Air",
-                "desc": "苹果超薄笔记本",
-                "price": 7000,
-                "detail": "<p>苹果超薄笔记本</p>\n",
-                "pCategoryId": "0",
-                "categoryId": "608d3e3eebe5b998882ce135",
-                "__v": 0
-            }
-        ]
+        total: 0,
+        products: [],
+        loading: false,
+        searchName: "",
+        searchType: "productName",
+        curPage: 1
     }
 
     initColums = () => {
@@ -89,18 +71,65 @@ export default class ProductHome extends Component {
         this.initColums()
     }
 
+    getProducts = async (pageNum) => {
+
+        this.setState({ loading: true })
+
+        const { searchName, searchType } = this.state
+        let result
+
+        if (searchName) {
+            result = await reqSearchProducts(pageNum, PAGE_SIZE, searchName, searchType)
+        } else {
+            result = await reqProducts(pageNum, PAGE_SIZE)
+        }
+
+        this.setState({ loading: false })
+
+        if (result.status === 0) {
+            const { total, list } = result.data
+            this.setState({
+                total,
+                products: list
+            })
+        }
+    }
+
+    onClickSearch = () => {
+        this.setState({
+            curPage: 1,
+        });
+        this.getProducts(1)
+    }
+
+    componentDidMount() {
+        this.getProducts(1)
+    }
+
+    onChange = page => {
+        this.setState({
+            curPage: page,
+        });
+        this.getProducts(page)
+    };
+
     render() {
 
-        const { products } = this.state
+        const { products, total, loading, searchName, searchType, curPage } = this.state
 
         const title = (
             <span>
-                <Select value='1' style={{ width: 150 }}>
-                    <Option value='1'>按名称搜索</Option>
-                    <Option value='2'>按描述搜索</Option>
+                <Select value={searchType} style={{ width: 150 }} onChange={value => this.setState({ searchType: value })}>
+                    <Option value='productName'>按名称搜索</Option>
+                    <Option value='productDesc'>按描述搜索</Option>
                 </Select>
-                <Input placeholder='关键字' style={{ width: 150, margin: '0 15px' }} />
-                <Button type='primary'>搜索</Button>
+                <Input
+                    placeholder='关键字'
+                    style={{ width: 150, margin: '0 15px' }}
+                    value={searchName}
+                    onChange={e => this.setState({ searchName: e.target.value })}
+                />
+                <Button type='primary' onClick={this.onClickSearch}>搜索</Button>
             </span>
         )
 
@@ -112,7 +141,22 @@ export default class ProductHome extends Component {
 
         return (
             <Card title={title} extra={extra}>
-                <Table rowkey='_id' dataSource={products} columns={this.columns} bordered />
+                <Table
+                    bordered
+                    rowKey="_id"
+                    loading={loading}
+                    dataSource={products}
+                    columns={this.columns}
+                    pagination={{
+                        defaultPageSize: PAGE_SIZE,
+                        showQuickJumper: true,
+                        total,
+                        // current: this.state.curPage,
+                        current: curPage,
+                        // onChange: (pageNum) => { this.getProducts(pageNum) }
+                        onChange: this.onChange
+                    }}
+                />
             </Card>
         )
     }
