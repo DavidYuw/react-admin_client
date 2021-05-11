@@ -1,12 +1,12 @@
 import React, { Component } from 'react'
-import { Card, Select, Input, Button, Table } from 'antd'
+import { Card, Select, Input, Button, Table, message } from 'antd'
 
 import {
     PlusOutlined
 } from '@ant-design/icons'
 
 import LinkButton from '../../components/link-button'
-import { reqProducts, reqSearchProducts } from '../../api/index'
+import { reqProducts, reqSearchProducts, reqUpdateStatus } from '../../api/index'
 import { PAGE_SIZE } from '../../utils/constants'
 
 const Option = Select.Option
@@ -20,6 +20,14 @@ export default class ProductHome extends Component {
         searchName: "",
         searchType: "productName",
         curPage: 1
+    }
+
+    updataStatus = async (productId, status) => {
+        const result = await reqUpdateStatus(productId, status)
+        if (result.status === 0) {
+            message.success('更新商品状态成功')
+            this.getProducts(this.pageNum)
+        } 
     }
 
     initColums = () => {
@@ -42,12 +50,14 @@ export default class ProductHome extends Component {
             {
                 width: 100,
                 title: '状态',
-                dataIndex: 'status',
-                render: (status) => {
+                render: (product) => {
+                    const { status, _id } = product
                     return (
                         <span>
-                            <Button type='primary'>下架</Button>
-                            <span>在售</span>
+                            <Button type='primary' onClick={() => this.updataStatus(_id, status === 1 ? 2 : 1)}>
+                                {status === 1 ? '下架' : '上架'}
+                            </Button>
+                            <span>{status === 1 ? '在售' : '已下架'}</span>
                         </span>
                     )
                 }
@@ -58,7 +68,7 @@ export default class ProductHome extends Component {
                 render: (product) => {
                     return (
                         <span>
-                            <LinkButton onClick={() => this.props.history.push('/product/detail', {product})}>详情</LinkButton>
+                            <LinkButton onClick={() => this.props.history.push('/product/detail', { product })}>详情</LinkButton>
                             <LinkButton>修改</LinkButton>
                         </span>
                     )
@@ -72,6 +82,8 @@ export default class ProductHome extends Component {
     }
 
     getProducts = async (pageNum) => {
+
+        this.pageNum = pageNum
 
         this.setState({ loading: true })
 

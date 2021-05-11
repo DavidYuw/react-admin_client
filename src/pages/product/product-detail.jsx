@@ -12,13 +12,41 @@ import {
 import LinkButton from '../../components/link-button'
 import { BASE_IMG_URL } from '../../utils/constants'
 
+import { reqCategoryById } from '../../api/index'
+
 const Item = List.Item
 
 export default class ProductDetail extends Component {
+
+
+    state = {
+        cName1: '',
+        cName2: ''
+    }
+
+    async componentDidMount() {
+        const { pCategoryId, categoryId } = this.props.location.state.product
+        
+        if (pCategoryId === '0') {
+            const result = await reqCategoryById(categoryId)           
+            const cName1 = result.data.name
+            this.setState({ cName1 })
+        } else {    
+            const results = await Promise.all([reqCategoryById(pCategoryId),reqCategoryById(categoryId)])
+            const cName1 = results[0].data.name
+            const cName2 = results[1].data.name
+            this.setState({
+                cName1,
+                cName2
+            })
+
+        }
+    }
+
     render() {
-        console.log( this.props.location.state.product)
+        console.log(this.props.location.state.product)
         const { name, desc, price, imgs, detail } = this.props.location.state.product
-       
+        const { cName1, cName2 } = this.state
 
         const title = (
             <span>
@@ -46,7 +74,7 @@ export default class ProductDetail extends Component {
                     </Item>
                     <Item className="product-detail-list-item">
                         <span className="left">所属分类:</span>
-                        <span>电脑 -- 笔记本</span>
+                        <span>{cName1}  {cName2 ? '--' + cName2 : ''}</span>
                     </Item>
                     <Item className="product-detail-list-item">
                         <span className="left">商品图片:</span>
