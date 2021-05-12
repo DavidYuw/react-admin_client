@@ -44,7 +44,7 @@ export default class ProductDetail extends Component {
     }
 
     render() {
-        console.log(this.props.location.state.product)
+        // console.log(this.props.location.state.product)
         const { name, desc, price, imgs, detail } = this.props.location.state.product
         const { cName1, cName2 } = this.state
 

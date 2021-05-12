@@ -18,8 +18,7 @@ export default class ProductHome extends Component {
         products: [],
         loading: false,
         searchName: "",
-        searchType: "productName",
-        curPage: 1
+        searchType: "productName"
     }
 
     updataStatus = async (productId, status) => {
@@ -27,7 +26,7 @@ export default class ProductHome extends Component {
         if (result.status === 0) {
             message.success('更新商品状态成功')
             this.getProducts(this.pageNum)
-        } 
+        }
     }
 
     initColums = () => {
@@ -83,6 +82,8 @@ export default class ProductHome extends Component {
 
     getProducts = async (pageNum) => {
 
+        // console.log(pageNum)
+
         this.pageNum = pageNum
 
         this.setState({ loading: true })
@@ -108,9 +109,6 @@ export default class ProductHome extends Component {
     }
 
     onClickSearch = () => {
-        this.setState({
-            curPage: 1,
-        });
         this.getProducts(1)
     }
 
@@ -118,16 +116,9 @@ export default class ProductHome extends Component {
         this.getProducts(1)
     }
 
-    onChange = page => {
-        this.setState({
-            curPage: page,
-        });
-        this.getProducts(page)
-    };
-
     render() {
 
-        const { products, total, loading, searchName, searchType, curPage } = this.state
+        const { products, total, loading, searchName, searchType } = this.state
 
         const title = (
             <span>
@@ -146,7 +137,7 @@ export default class ProductHome extends Component {
         )
 
         const extra = (
-            <Button type='primary'>
+            <Button type='primary' onClick={() => this.props.history.push('/product/addupdate')}>
                 <PlusOutlined />添加商品
             </Button>
         )
@@ -160,13 +151,11 @@ export default class ProductHome extends Component {
                     dataSource={products}
                     columns={this.columns}
                     pagination={{
+                        current: this.pageNum,
                         defaultPageSize: PAGE_SIZE,
                         showQuickJumper: true,
                         total,
-                        // current: this.state.curPage,
-                        current: curPage,
-                        // onChange: (pageNum) => { this.getProducts(pageNum) }
-                        onChange: this.onChange
+                        onChange: (pageNum) => this.getProducts(pageNum)
                     }}
                 />
             </Card>

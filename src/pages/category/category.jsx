@@ -20,7 +20,6 @@ export default class Category extends Component {
         parentId: '0',
         parentName: '',
         showState: 0, //0 both hide ,1 add modal show, 2 modify modal show
-        curPage: 1
     }
 
     showCategory = () => {
@@ -28,7 +27,6 @@ export default class Category extends Component {
             parentId: '0',
             parentName: '',
             subCategory: [],
-            curPage: 1
         })
     }
 
@@ -36,9 +34,8 @@ export default class Category extends Component {
         this.setState({
             parentId: rowItem._id,
             parentName: rowItem.name,
-            curPage: 1
         }, () => {
-            this.getCategory()
+            this.getCategory(1)
         })
     }
 
@@ -65,7 +62,9 @@ export default class Category extends Component {
         this.initColumList()
     }
 
-    getCategory = async (parentId) => {
+    getCategory = async (pageNum, parentId) => {
+        this.pageNum = pageNum
+
         this.setState({ loading: true })
 
         parentId = parentId || this.state.parentId
@@ -93,7 +92,7 @@ export default class Category extends Component {
     }
 
     showAddCategory = () => {
-        
+
         this.setState({
             showState: 1
         })
@@ -162,17 +161,13 @@ export default class Category extends Component {
     }
 
     componentDidMount() {
-        this.getCategory()
+        this.getCategory(1)
     }
 
 
-    onChange = page => {
-        this.setState({
-            curPage: page,
-        });
-    };
-
     render() {
+
+        // console.log("@", this.pageNum)
 
         const { category, subCategory, parentId, parentName, loading, showState } = this.state
 
@@ -202,7 +197,7 @@ export default class Category extends Component {
                     loading={loading}
                     dataSource={parentId === '0' ? category : subCategory}
                     columns={this.columns}
-                    pagination={{ defaultPageSize: 2, showQuickJumper: true, current: this.state.curPage, onChange: this.onChange }}
+                    pagination={{ defaultPageSize: 2, showQuickJumper: true, current: this.pageNum, onChange: this.getCategory }}
                 />
 
                 <Modal title="添加分类" visible={showState === 1} onOk={this.addCategory} onCancel={this.handleCancel}  >

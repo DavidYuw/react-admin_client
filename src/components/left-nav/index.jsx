@@ -29,7 +29,7 @@ class LeftNav extends Component {
                 )
             } else {
 
-                const cItem = item.children.find(cItem => cItem.key === pathname)
+                const cItem = item.children.find(cItem => pathname.indexOf(cItem.key) === 0)
 
                 if (cItem) {
                     this.openKey = item.key
@@ -50,8 +50,11 @@ class LeftNav extends Component {
 
     render() {
 
-        const pathname = this.props.location.pathname;
+        let pathname = this.props.location.pathname;
         // console.log(pathname);
+        if (pathname.indexOf("/product") === 0) {
+            pathname = "/product"
+        }
 
         return (
             <div className="left-nav">
