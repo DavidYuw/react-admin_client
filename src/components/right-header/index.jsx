@@ -36,7 +36,7 @@ class RightHeader extends Component {
             if (item.key === pathname) {
                 title = item.title
             } else if (item.children) {
-                const cItem = item.children.find((item) => item.key === pathname)
+                const cItem = item.children.find((item) => pathname.indexOf(item.key) === 0)
                 if (cItem) {
                     title = cItem.title
                 }
