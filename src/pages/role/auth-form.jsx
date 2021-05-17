@@ -14,78 +14,62 @@ export default class AuthForm extends Component {
         role: PropTypes.object
     }
 
-    treeData = [
-        {
-            title: '平台权限',
-            key: 'all',
-            children: [
-                {
-                    title: 'parent 1-0',
-                    key: '0-0-0',
-                    disabled: true,
-                    children: [
-                        {
-                            title: 'leaf',
-                            key: '0-0-0-0',
-                            disableCheckbox: true,
-                        },
-                        {
-                            title: 'leaf',
-                            key: '0-0-0-1',
-                        },
-                    ],
-                },
-                {
-                    title: 'parent 1-1',
-                    key: '0-0-1',
-                    children: [
-                        {
-                            title: (
-                                <span
-                                    style={{
-                                        color: '#1890ff',
-                                    }}
-                                >
-                                    sss
-                                </span>
-                            ),
-                            key: '0-0-1-0',
-                        },
-                    ],
-                },
-            ],
-        },
-    ];
+    constructor(props) {
+        super(props)
+        const { menus } = this.props.role
+        this.state = {
+            checkedKeys: menus
+        }
+    }
+
 
     onSelect = (selectedKeys, info) => {
-        console.log('selected', selectedKeys, info);
+        // console.log('selected', selectedKeys, info);
     };
 
     onCheck = (checkedKeys, info) => {
-        console.log('onCheck', checkedKeys, info);
+        // console.log('onCheck', checkedKeys, info);
+        this.setState({ checkedKeys })
     };
 
-    getTreeNodes = () => {
+    getTreeNodes = (menuList) => {
+        // debugger
         return menuList.reduce((pre, item) => {
-            console.log(item.children)
+            // console.log("@" + item.children)
             pre.push({
                 title: item.title,
                 key: item.key,
-                // children: (item.children ? this.getTreeNodes(item.children) : null)
+                children: (item.children ? this.getTreeNodes(item.children) : null)
             })
             return pre
         }, [])
     }
 
-    UNSAFE_componentWillMount() {
-        this.treeNodes = this.getTreeNodes(menuList)
+    getMenus = () => {
+        return this.state.checkedKeys
+    }
 
-        console.log(this.treeNodes)
+    UNSAFE_componentWillMount() {
+        this.treeNodes = [{
+            title: "平台权限",
+            key: "all"
+        }]
+
+        this.treeNodes[0].children = this.getTreeNodes(menuList)
+
+    }
+
+    UNSAFE_componentWillReceiveProps(nextProps) {
+        const menus = nextProps.role.menus
+        this.setState({
+            checkedKeys: menus
+        })
     }
 
     render() {
 
         const { role } = this.props
+        const { checkedKeys } = this.state
 
         const formItemLayout = {
             labelCol: { span: 4 },
@@ -100,7 +84,9 @@ export default class AuthForm extends Component {
                 <Tree
                     checkable
                     defaultExpandAll={true}
-                    treeData={this.treeData}
+                    onCheck={this.onCheck}
+                    checkedKeys={checkedKeys}
+                    treeData={this.treeNodes}
                 />
             </div>
         )
